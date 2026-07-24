@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A1 Deutsch Quiz - Essen und Trinken</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&family=JetBrains+Mono:wght@600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet"></noscript>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="stage">
+
+  <!-- Setup Screen -->
+  <div id="setup-screen" class="screen setup-screen">
+    <div class="setup-card">
+      <div class="setup-badge">A1</div>
+      <h1 class="brand">Deutsch&nbsp;Quiz</h1>
+      <p class="brand-sub">Kapitel 5: Essen &amp; Trinken</p>
+
+      <div class="setup-info">
+        <span class="chip">⏱️ 25 Minuten</span>
+        <span class="chip">📝 50 Fragen</span>
+      </div>
+
+      <label for="student-name" class="field-label">Dein Name</label>
+      <input type="text" id="student-name" placeholder="Vor- und Nachname..." required>
+
+      <button class="btn-primary" onclick="startQuiz()">Quiz starten 🚀</button>
+    </div>
+  </div>
+
+  <!-- Quiz Screen -->
+  <div id="quiz-screen" class="screen quiz-screen">
+
+    <div class="topbar">
+      <div class="progress-track">
+        <div class="progress-fill" id="progress-fill"></div>
+        <div class="progress-rocket" id="progress-rocket">🚀</div>
+      </div>
+      <div class="timer-pill" id="timer">25:00</div>
+    </div>
+
+    <form id="quiz-form">
+
+      <section class="exercise" data-exercise="1">
+        <h2 class="exercise-title"><span class="exercise-icon">🍲</span> Übung 1 <small>Verben im Kontext</small></h2>
+        <p class="exercise-hint">Ergänze das richtige Verb in der richtigen Form.</p>
+        <div id="u1-container"></div>
+      </section>
+
+      <section class="exercise" data-exercise="2">
+        <h2 class="exercise-title"><span class="exercise-icon">❓</span> Übung 2 <small>Fragen formulieren</small></h2>
+        <p class="exercise-hint">Tippe die Wörter in der richtigen Reihenfolge an, um eine Frage zu bilden.</p>
+        <div id="u2-container"></div>
+      </section>
+
+      <section class="exercise" data-exercise="3">
+        <h2 class="exercise-title"><span class="exercise-icon">🍽️</span> Übung 3 <small>Dialog im Restaurant</small></h2>
+        <p class="exercise-hint">Ergänze das fehlende Wort (Verben, Artikel, Negation).</p>
+        <div id="u3-container"></div>
+      </section>
+
+      <section class="exercise" data-exercise="4">
+        <h2 class="exercise-title"><span class="exercise-icon">🚫</span> Übung 4 <small>Negation</small></h2>
+        <p class="exercise-hint">Wähle: nicht, kein, keine oder keinen.</p>
+        <div id="u4-container"></div>
+      </section>
+
+      <section class="exercise" data-exercise="5">
+        <h2 class="exercise-title"><span class="exercise-icon">📝</span> Übung 5 <small>Satzbau — Aussagen</small></h2>
+        <p class="exercise-hint">Tippe die Wörter in der richtigen Reihenfolge an, um einen Aussagesatz zu bilden.</p>
+        <div id="u5-container"></div>
+      </section>
+
+      <div class="submit-row">
+        <button type="button" class="btn-primary btn-submit" onclick="submitQuiz(false)">Antworten senden ✅</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Loading Screen -->
+  <div id="loading-screen" class="screen loading-screen">
+    <div class="spinner"></div>
+    <h2>Antworten werden ausgewertet...</h2>
+    <p class="loading-count" id="loading-countdown">3</p>
+  </div>
+
+  <!-- Result Screen -->
+  <div id="result-screen" class="screen result-screen">
+    <canvas id="confetti-canvas"></canvas>
+    <div class="result-card">
+      <h2>Ergebnis für <span id="display-name" class="highlight"></span></h2>
+      <div class="score-ring-wrap">
+        <div class="score-ring" id="score-ring">
+          <div class="score-ring-inner">
+            <span id="score-text">0</span>
+            <small>/ 50</small>
+          </div>
+        </div>
+      </div>
+      <p id="result-message" class="result-message"></p>
+      <p class="details-label">Details (Fehler und Korrekturen):</p>
+      <div id="errors-container"></div>
+    </div>
+  </div>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
