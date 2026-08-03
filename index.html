@@ -1,115 +1,206 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>A1 Deutsch Quiz - Essen und Trinken</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&family=JetBrains+Mono:wght@600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
-<noscript><link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet"></noscript>
-<link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>A1 Deutsch Quiz | Interactive App</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Cairo:wght@500;700&display=swap" rel="stylesheet">
+    <!-- ربط ملف الـ CSS -->
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div class="stage">
+    <div class="bg-shape shape1"></div>
+    <div class="bg-shape shape2"></div>
+    <div class="bg-shape shape3"></div>
 
-  <!-- Setup Screen -->
-  <div id="setup-screen" class="screen setup-screen">
-    <div class="setup-card">
-      <div class="setup-badge">A1</div>
-      <h1 class="brand">Deutsch&nbsp;Quiz</h1>
-      <p class="brand-sub">Kapitel 5: Essen &amp; Trinken</p>
-
-      <div class="setup-info">
-        <span class="chip">⏱️ 25 Minuten</span>
-        <span class="chip">📝 50 Fragen</span>
-      </div>
-
-      <label for="student-name" class="field-label">Dein Name</label>
-      <input type="text" id="student-name" placeholder="Vor- und Nachname..." required>
-
-      <button class="btn-primary" onclick="startQuiz()">Quiz starten 🚀</button>
-    </div>
-  </div>
-
-  <!-- Quiz Screen -->
-  <div id="quiz-screen" class="screen quiz-screen">
-
-    <div class="topbar">
-      <div class="progress-track">
-        <div class="progress-fill" id="progress-fill"></div>
-        <div class="progress-rocket" id="progress-rocket">🚀</div>
-      </div>
-      <div class="timer-pill" id="timer">25:00</div>
-    </div>
-
-    <form id="quiz-form">
-
-      <section class="exercise" data-exercise="1">
-        <h2 class="exercise-title"><span class="exercise-icon">🍲</span> Übung 1 <small>Verben im Kontext</small></h2>
-        <p class="exercise-hint">Ergänze das richtige Verb in der richtigen Form.</p>
-        <div id="u1-container"></div>
-      </section>
-
-      <section class="exercise" data-exercise="2">
-        <h2 class="exercise-title"><span class="exercise-icon">❓</span> Übung 2 <small>Fragen formulieren</small></h2>
-        <p class="exercise-hint">Tippe die Wörter in der richtigen Reihenfolge an, um eine Frage zu bilden.</p>
-        <div id="u2-container"></div>
-      </section>
-
-      <section class="exercise" data-exercise="3">
-        <h2 class="exercise-title"><span class="exercise-icon">🍽️</span> Übung 3 <small>Dialog im Restaurant</small></h2>
-        <p class="exercise-hint">Ergänze das fehlende Wort (Verben, Artikel, Negation).</p>
-        <div id="u3-container"></div>
-      </section>
-
-      <section class="exercise" data-exercise="4">
-        <h2 class="exercise-title"><span class="exercise-icon">🚫</span> Übung 4 <small>Negation</small></h2>
-        <p class="exercise-hint">Wähle: nicht, kein, keine oder keinen.</p>
-        <div id="u4-container"></div>
-      </section>
-
-      <section class="exercise" data-exercise="5">
-        <h2 class="exercise-title"><span class="exercise-icon">📝</span> Übung 5 <small>Satzbau — Aussagen</small></h2>
-        <p class="exercise-hint">Tippe die Wörter in der richtigen Reihenfolge an, um einen Aussagesatz zu bilden.</p>
-        <div id="u5-container"></div>
-      </section>
-
-      <div class="submit-row">
-        <button type="button" class="btn-primary btn-submit" onclick="submitQuiz(false)">Antworten senden ✅</button>
-      </div>
-    </form>
-  </div>
-
-  <!-- Loading Screen -->
-  <div id="loading-screen" class="screen loading-screen">
-    <div class="spinner"></div>
-    <h2>Antworten werden ausgewertet...</h2>
-    <p class="loading-count" id="loading-countdown">3</p>
-  </div>
-
-  <!-- Result Screen -->
-  <div id="result-screen" class="screen result-screen">
-    <canvas id="confetti-canvas"></canvas>
-    <div class="result-card">
-      <h2>Ergebnis für <span id="display-name" class="highlight"></span></h2>
-      <div class="score-ring-wrap">
-        <div class="score-ring" id="score-ring">
-          <div class="score-ring-inner">
-            <span id="score-text">0</span>
-            <small>/ 50</small>
-          </div>
+    <div id="top-bar" class="hidden">
+        <div class="progress-container">
+            <div id="progress-bar"></div>
         </div>
-      </div>
-      <p id="result-message" class="result-message"></p>
-      <p class="details-label">Details (Fehler und Korrekturen):</p>
-      <div id="errors-container"></div>
+        <div class="bar-content">
+            <span id="current-teil-indicator" class="teil-badge">Teil 1</span>
+            <div id="timer-badge" class="timer-badge">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                <span id="timer-text">15:00</span>
+            </div>
+        </div>
     </div>
-  </div>
 
-</div>
+    <div id="warning-modal" class="modal-overlay hidden" dir="rtl">
+        <div class="modal-content slide-up">
+            <div class="modal-icon">👀</div>
+            <h3 style="font-family: 'Cairo', sans-serif;">انتظر لحظة!</h3>
+            <p style="font-family: 'Cairo', sans-serif;">لقد نسيت الإجابة على بعض الأسئلة. هل أنت متأكد أنك تريد إنهاء الامتحان؟</p>
+            <div class="modal-actions">
+                <button id="cancel-submit-btn" class="secondary-btn" style="font-family: 'Cairo', sans-serif;">العودة للحل</button>
+                <button id="confirm-submit-btn" class="primary-btn" style="font-family: 'Cairo', sans-serif;">إنهاء وإظهار النتيجة</button>
+            </div>
+        </div>
+    </div>
 
-<script src="script.js"></script>
+    <main class="app-container">
+
+        <div id="welcome-screen" class="glass-panel slide-up active">
+            <div class="welcome-content">
+                <div class="logo-icon bounce">🇩🇪</div>
+                <h1>Willkommen zum Quiz!</h1>
+                <p>Bitte trage deinen Namen ein, um zu beginnen</p>
+                <div class="input-group">
+                    <input type="text" id="student-name" placeholder="Dein Name..." autocomplete="off">
+                </div>
+                <button id="start-btn" class="primary-btn ripple">Los geht's!</button>
+            </div>
+        </div>
+
+        <div id="quiz-screen" class="hidden">
+            <header class="quiz-header fade-in">
+                <h2>Viel Erfolg, <span id="display-name" class="highlight-text"></span>! 🌟</h2>
+            </header>
+
+            <section class="quiz-section glass-panel fade-in" id="teil-1">
+                <div class="section-header">
+                    <h3>Teil 1: Sich vorstellen</h3>
+                    <p>Ziehe die richtigen Wörter in die Lücken.</p>
+                </div>
+
+                <div class="word-bank" id="bank-1">
+                    <div class="draggable" draggable="true" tabindex="0" id="w4">kommen</div>
+                    <div class="draggable" draggable="true" tabindex="0" id="w1">ist</div>
+                    <div class="draggable" draggable="true" tabindex="0" id="w7">wohne</div>
+                    <div class="draggable" draggable="true" tabindex="0" id="w5">komme</div>
+                    <div class="draggable" draggable="true" tabindex="0" id="w2">heißen</div>
+                    <div class="draggable" draggable="true" tabindex="0" id="w8">wohnen</div>
+                    <div class="draggable" draggable="true" tabindex="0" id="w6">komme</div>
+                    <div class="draggable" draggable="true" tabindex="0" id="w3">heiße</div>
+                    <div class="draggable" draggable="true" tabindex="0" id="w9">wohne</div>
+                </div>
+
+                <div class="dialogue modern-card">
+                    <p><strong>Frau Richter:</strong> Guten Tag. Mein Name <span class="drop-zone" id="z1"></span> Lydia Richter. Wie <span class="drop-zone" id="z2"></span> Sie?</p>
+                    <p><strong>Herr Martinez:</strong> Ich <span class="drop-zone" id="z3"></span> Mario Martinez.</p>
+                    <p><strong>Frau Richter:</strong> Woher <span class="drop-zone" id="z4"></span> Sie, Herr Martinez?</p>
+                    <p><strong>Herr Martinez:</strong> Ich <span class="drop-zone" id="z5"></span> aus Spanien. Und Sie?</p>
+                    <p><strong>Frau Richter:</strong> Ich <span class="drop-zone" id="z6"></span> aus Österreich. Ich <span class="drop-zone" id="z7"></span> in Wien. Wo <span class="drop-zone" id="z8"></span> Sie?</p>
+                    <p><strong>Herr Martinez:</strong> Ich <span class="drop-zone" id="z9"></span> in Madrid.</p>
+                </div>
+            </section>
+
+            <section class="quiz-section glass-panel fade-in" id="teil-2">
+                <div class="section-header">
+                    <h3>Teil 2: Sätze kombinieren (Steffi)</h3>
+                    <p>Ziehe die passenden Satzenden in die Boxen.</p>
+                </div>
+
+                <div class="word-bank" id="bank-2">
+                    <div class="draggable" draggable="true" tabindex="0" id="e5">jetzt Russisch</div>
+                    <div class="draggable" draggable="true" tabindex="0" id="e2">aus Deutschland</div>
+                    <div class="draggable" draggable="true" tabindex="0" id="e7">Gymnastik</div>
+                    <div class="draggable" draggable="true" tabindex="0" id="e1">Steffi</div>
+                    <div class="draggable" draggable="true" tabindex="0" id="e6">gern Tennis</div>
+                    <div class="draggable" draggable="true" tabindex="0" id="e4">Deutsch</div>
+                    <div class="draggable" draggable="true" tabindex="0" id="e3">in München</div>
+                    <div class="draggable" draggable="true" tabindex="0" id="e8">gern Musik</div>
+                </div>
+
+                <ul class="match-list modern-card">
+                    <li><span>1. Das ist</span> <span class="drop-zone large" id="s1"></span></li>
+                    <li><span>2. Steffi kommt</span> <span class="drop-zone large" id="s2"></span></li>
+                    <li><span>3. Sie wohnt</span> <span class="drop-zone large" id="s3"></span></li>
+                    <li><span>4. Steffi spricht</span> <span class="drop-zone large" id="s4"></span></li>
+                    <li><span>5. Sie lernt</span> <span class="drop-zone large" id="s5"></span></li>
+                    <li><span>6. Sie spielt</span> <span class="drop-zone large" id="s6"></span></li>
+                    <li><span>7. Sie macht</span> <span class="drop-zone large" id="s7"></span></li>
+                    <li><span>8. Sie hört</span> <span class="drop-zone large" id="s8"></span></li>
+                </ul>
+            </section>
+
+            <section class="quiz-section glass-panel fade-in" id="teil-3">
+                <div class="section-header">
+                    <h3>Teil 3: Wer macht was?</h3>
+                    <p>Schreibe die fehlenden Endungen (-e, -st, -t, -en) in die Felder.</p>
+                </div>
+
+                <div class="text-inputs modern-card">
+                    <p>1. Alexis und Yanis komm<input type="text" class="text-gap" id="t1" maxlength="3" autocomplete="off"> aus Griechenland. Sie spiel<input type="text" class="text-gap" id="t2" maxlength="3" autocomplete="off"> gern Fußball.</p>
+                    <p>2. Viktor wohn<input type="text" class="text-gap" id="t3" maxlength="3" autocomplete="off"> in Stockholm. Er fotografier<input type="text" class="text-gap" id="t4" maxlength="3" autocomplete="off"> gern.</p>
+                    <p>3. Tiago sprich<input type="text" class="text-gap" id="t5" maxlength="3" autocomplete="off"> Portugiesisch und Spanisch. Er koch<input type="text" class="text-gap" id="t6" maxlength="3" autocomplete="off"> gern.</p>
+                    <p>4. Laura und Anna wohn<input type="text" class="text-gap" id="t7" maxlength="3" autocomplete="off"> in Bern. Sie schwimm<input type="text" class="text-gap" id="t8" maxlength="3" autocomplete="off"> gern.</p>
+                    <p>5. Lili, Fanni und Levente sprech<input type="text" class="text-gap" id="t9" maxlength="3" autocomplete="off"> Ungarisch. Sie tanz<input type="text" class="text-gap" id="t10" maxlength="3" autocomplete="off"> gern.</p>
+                    <p>6. Martina komm<input type="text" class="text-gap" id="t11" maxlength="3" autocomplete="off"> aus der Schweiz. Sie lern<input type="text" class="text-gap" id="t12" maxlength="3" autocomplete="off"> gern Sprachen.</p>
+                    <p>7. Ich trink<input type="text" class="text-gap" id="t13" maxlength="3" autocomplete="off"> Tee und ich spiel<input type="text" class="text-gap" id="t14" maxlength="3" autocomplete="off"> gern Gitarre.</p>
+                    <p>8. Du lern<input type="text" class="text-gap" id="t15" maxlength="3" autocomplete="off"> schnell Deutsch. Du hör<input type="text" class="text-gap" id="t16" maxlength="3" autocomplete="off"> gern Radio.</p>
+                    <p>9. Sara und Jan kauf<input type="text" class="text-gap" id="t17" maxlength="3" autocomplete="off"> ein Buch. Sie schreib<input type="text" class="text-gap" id="t18" maxlength="3" autocomplete="off"> eine E-Mail.</p>
+                    <p>10. Ihr mach<input type="text" class="text-gap" id="t19" maxlength="3" autocomplete="off"> heute Sport und ihr geh<input type="text" class="text-gap" id="t20" maxlength="3" autocomplete="off"> ins Kino.</p>
+                </div>
+            </section>
+
+            <section class="quiz-section glass-panel fade-in" id="teil-4">
+                <div class="section-header">
+                    <h3>Teil 4: Über Markus</h3>
+                    <p>Ziehe die passenden Satzenden in die Boxen.</p>
+                </div>
+
+                <div class="word-bank" id="bank-3">
+                    <div class="draggable" draggable="true" tabindex="0" id="f6">gern Basketball</div>
+                    <div class="draggable" draggable="true" tabindex="0" id="f3">in Rom</div>
+                    <div class="draggable" draggable="true" tabindex="0" id="f8">gern Tee</div>
+                    <div class="draggable" draggable="true" tabindex="0" id="f1">Markus</div>
+                    <div class="draggable" draggable="true" tabindex="0" id="f4">Italienisch</div>
+                    <div class="draggable" draggable="true" tabindex="0" id="f7">viel Sport</div>
+                    <div class="draggable" draggable="true" tabindex="0" id="f5">jetzt Arabisch</div>
+                    <div class="draggable" draggable="true" tabindex="0" id="f2">aus Italien</div>
+                </div>
+
+                <ul class="match-list modern-card">
+                    <li><span>1. Das ist</span> <span class="drop-zone large" id="p1"></span></li>
+                    <li><span>2. Er kommt</span> <span class="drop-zone large" id="p2"></span></li>
+                    <li><span>3. Er wohnt</span> <span class="drop-zone large" id="p3"></span></li>
+                    <li><span>4. Markus spricht</span> <span class="drop-zone large" id="p4"></span></li>
+                    <li><span>5. Er lernt</span> <span class="drop-zone large" id="p5"></span></li>
+                    <li><span>6. Er spielt</span> <span class="drop-zone large" id="p6"></span></li>
+                    <li><span>7. Er macht</span> <span class="drop-zone large" id="p7"></span></li>
+                    <li><span>8. Er trinkt</span> <span class="drop-zone large" id="p8"></span></li>
+                </ul>
+            </section>
+
+            <div class="action-footer">
+                <button id="check-btn" class="primary-btn submit-btn ripple" style="font-family: 'Cairo', sans-serif;">
+                    <span class="btn-text">إظهار النتيجة</span>
+                    <div class="spinner hidden"></div>
+                </button>
+            </div>
+        </div>
+
+        <div id="result-screen" class="hidden glass-panel slide-up">
+            <div class="result-header">
+                <div id="result-emoji" class="emoji-huge">🎉</div>
+                <h2 dir="rtl" style="font-family: 'Cairo', sans-serif;">النتيجة النهائية</h2>
+            </div>
+
+            <div class="stats-grid" dir="rtl" style="font-family: 'Cairo', sans-serif;">
+                <div class="stat-card">
+                    <div class="progress-circle" id="score-circle">
+                        <div class="circle-inner" id="percent-text" style="font-family: 'Poppins', sans-serif;">100%</div>
+                    </div>
+                </div>
+                <div class="stat-details">
+                    <div class="stat-row"><span class="label">الدرجة:</span> <span class="val" id="score-val" style="font-family: 'Poppins', sans-serif;"></span></div>
+                    <div class="stat-row"><span class="label">الإجابات الصحيحة:</span> <span class="val success-text" id="correct-val" style="font-family: 'Poppins', sans-serif;"></span></div>
+                    <div class="stat-row"><span class="label">الأخطاء:</span> <span class="val error-text" id="wrong-val" style="font-family: 'Poppins', sans-serif;"></span></div>
+                    <div class="stat-row"><span class="label">الوقت المستغرق:</span> <span class="val" id="time-val"></span></div>
+                </div>
+            </div>
+
+            <div id="errors-container" class="hidden" dir="rtl" style="font-family: 'Cairo', sans-serif;">
+                <h3>الأخطاء والتصحيح</h3>
+                <div id="errors-list"></div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- ربط ملف الـ JS -->
+    <script src="script.js"></script>
 </body>
 </html>
