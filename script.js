@@ -1,277 +1,481 @@
-/* --- Variables & Reset --- */
-:root {
-    --primary: #FF8C42;
-    --primary-hover: #F27627;
-    --secondary: #FFD166;
-    --success: #00B74A;
-    --error: #E53935;
-    --warning: #FFB300;
-    --bg-light: #FFF8F3;
-    --text-main: #2D3748;
-    --text-muted: #718096;
-    --glass-bg: rgba(255, 255, 255, 0.9);
-    --glass-border: rgba(255, 255, 255, 0.6);
-    --shadow-soft: 0 12px 32px -8px rgba(0, 0, 0, 0.08);
-    --radius-lg: 24px;
-    --radius-md: 16px;
-    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+// ==========================================
+// A1 Quiz Logic (Mobile-fixed)
+// ==========================================
+
+let studentName = "";
+let timerInterval;
+const TOTAL_MINUTES = 15;
+let timeRemaining = TOTAL_MINUTES * 60;
+let quizStarted = false;
+let startTime = null;
+let endTime = null;
+let isSubmitted = false;
+
+const solutionKey = {
+    "z1": "aXN0", "z2": "aGVpJUMzJTlGZW4=", "z3": "aGVpJUMzJTlGZQ==",
+    "z4": "a29tbWVu", "z5": "a29tbWU=", "z6": "a29tbWU=",
+    "z7": "d29obmU=", "z8": "d29obmVu", "z9": "d29obmU=",
+
+    "s1": "U3RlZmZp", "s2": "YXVzJTIwRGV1dHNjaGxhbmQ=", "s3": "aW4lMjBNJUMzJUJDbmNoZW4=",
+    "s4": "RGV1dHNjaA==", "s5": "amV0enQlMjBSdXNzaXNjaA==", "s6": "Z2VybiUyMFRlbm5pcw==",
+    "s7": "R3ltbmFzdGlr", "s8": "Z2VybiUyME11c2lr",
+
+    "t1": "ZW4=", "t2": "ZW4=", "t3": "dA==", "t4": "dA==",
+    "t5": "dA==", "t6": "dA==", "t7": "ZW4=", "t8": "ZW4=",
+    "t9": "ZW4=", "t10": "ZW4=", "t11": "dA==", "t12": "dA==",
+    "t13": "ZQ==", "t14": "ZQ==", "t15": "c3Q=", "t16": "c3Q=",
+    "t17": "ZW4=", "t18": "ZW4=", "t19": "dA==", "t20": "dA==",
+
+    "p1": "TWFya3Vz", "p2": "YXVzJTIwSXRhbGllbg==", "p3": "aW4lMjBSb20=",
+    "p4": "SXRhbGllbmlzY2g=", "p5": "amV0enQlMjBBcmFiaXNjaA==", "p6": "Z2VybiUyMEJhc2tldGJhbGw=",
+    "p7": "dmllbCUyMFNwb3J0", "p8": "Z2VybiUyMFRlZQ=="
+};
+
+const questionLabels = {
+    "z1": "Guten Tag. Mein Name [...] Lydia Richter.",
+    "z2": "Wie [...] Sie?",
+    "z3": "Ich [...] Mario Martinez.",
+    "z4": "Woher [...] Sie, Herr Martinez?",
+    "z5": "Ich [...] aus Spanien. Und Sie?",
+    "z6": "Ich [...] aus Österreich.",
+    "z7": "Ich [...] in Wien.",
+    "z8": "Wo [...] Sie?",
+    "z9": "Ich [...] in Madrid.",
+
+    "s1": "1. Das ist [...] (Steffi)",
+    "s2": "2. Steffi kommt [...] (aus Deutschland)",
+    "s3": "3. Sie wohnt [...] (in München)",
+    "s4": "4. Steffi spricht [...] (Deutsch)",
+    "s5": "5. Sie lernt [...] (jetzt Russisch)",
+    "s6": "6. Sie spielt [...] (gern Tennis)",
+    "s7": "7. Sie macht [...] (Gymnastik)",
+    "s8": "8. Sie hört [...] (gern Musik)",
+
+    "t1": "1. Alexis und Yanis komm[...] aus Griechenland.",
+    "t2": "1. Sie spiel[...] gern Fußball.",
+    "t3": "2. Viktor wohn[...] in Stockholm.",
+    "t4": "2. Er fotografier[...] gern.",
+    "t5": "3. Tiago sprich[...] Portugiesisch und Spanisch.",
+    "t6": "3. Er koch[...] gern.",
+    "t7": "4. Laura und Anna wohn[...] in Bern.",
+    "t8": "4. Sie schwimm[...] gern.",
+    "t9": "5. Lili, Fanni und Levente sprech[...] Ungarisch.",
+    "t10": "5. Sie tanz[...] gern.",
+    "t11": "6. Martina komm[...] aus der Schweiz.",
+    "t12": "6. Sie lern[...] gern Sprachen.",
+    "t13": "7. Ich trink[...] Tee...",
+    "t14": "7. ...und ich spiel[...] gern Gitarre.",
+    "t15": "8. Du lern[...] schnell Deutsch.",
+    "t16": "8. Du hör[...] gern Radio.",
+    "t17": "9. Sara und Jan kauf[...] ein Buch.",
+    "t18": "9. Sie schreib[...] eine E-Mail.",
+    "t19": "10. Ihr mach[...] heute Sport...",
+    "t20": "10. ...und ihr geh[...] ins Kino.",
+
+    "p1": "1. Das ist [...] (Markus)",
+    "p2": "2. Er kommt [...] (aus Italien)",
+    "p3": "3. Er wohnt [...] (in Rom)",
+    "p4": "4. Markus spricht [...] (Italienisch)",
+    "p5": "5. Er lernt [...] (jetzt Arabisch)",
+    "p6": "6. Er spielt [...] (gern Basketball)",
+    "p7": "7. Er macht [...] (viel Sport)",
+    "p8": "8. Er trinkt [...] (gern Tee)"
+};
+
+// --- Initialization & UI Flow ---
+document.getElementById('student-name').addEventListener('keypress', function (e) {
+    if (e.key === 'Enter') document.getElementById('start-btn').click();
+});
+
+document.getElementById('start-btn').addEventListener('click', () => {
+    const nameInput = document.getElementById('student-name').value.trim();
+    if (nameInput === "") {
+        const inputEl = document.getElementById('student-name');
+        inputEl.style.borderColor = "var(--error)";
+        inputEl.classList.add('incorrect');
+        setTimeout(() => inputEl.classList.remove('incorrect'), 400);
+        return;
+    }
+
+    studentName = nameInput;
+    document.getElementById('display-name').textContent = studentName;
+
+    document.getElementById('welcome-screen').classList.add('hidden');
+    document.getElementById('top-bar').classList.remove('hidden');
+    document.getElementById('quiz-screen').classList.remove('hidden');
+
+    quizStarted = true;
+    startTime = new Date();
+    startTimer();
+    initScrollObserver();
+});
+
+// --- Timer Logic ---
+function startTimer() {
+    const timerText = document.getElementById('timer-text');
+    const timerBadge = document.getElementById('timer-badge');
+
+    timerInterval = setInterval(() => {
+        if (timeRemaining <= 0) {
+            clearInterval(timerInterval);
+            timerText.textContent = "00:00";
+            if (!isSubmitted) {
+                document.getElementById('warning-modal').classList.add('hidden');
+                handleQuizFinish('بسبب انتهاء الوقت');
+            }
+            return;
+        }
+
+        timeRemaining--;
+        const mins = Math.floor(timeRemaining / 60);
+        const secs = timeRemaining % 60;
+        timerText.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+
+        if (timeRemaining <= 300 && timeRemaining > 60) {
+            timerBadge.className = 'timer-badge warning';
+        } else if (timeRemaining <= 60) {
+            timerBadge.className = 'timer-badge danger';
+        }
+    }, 1000);
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+function initScrollObserver() {
+    const sections = document.querySelectorAll('.quiz-section');
+    const progressBar = document.getElementById('progress-bar');
+    const badge = document.getElementById('current-teil-indicator');
 
-html { touch-action: pan-y; }
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const id = entry.target.id;
+                const num = id.split('-')[1];
+                badge.textContent = `Teil ${num}`;
+                progressBar.style.width = `${(num / sections.length) * 100}%`;
+            }
+        });
+    }, { threshold: 0.5 });
 
-body {
-    font-family: 'Poppins', 'Segoe UI', system-ui, sans-serif;
-    background-color: var(--bg-light);
-    color: var(--text-main);
-    overflow-x: hidden;
-    min-height: 100vh;
-    padding-bottom: 50px;
-    position: relative;
+    sections.forEach(sec => observer.observe(sec));
 }
 
-.bg-shape { position: fixed; border-radius: 50%; filter: blur(90px); z-index: -1; opacity: 0.5; }
-.shape1 { width: 450px; height: 450px; background: rgba(255, 140, 66, 0.3); top: -100px; left: -100px; }
-.shape2 { width: 350px; height: 350px; background: rgba(255, 209, 102, 0.3); bottom: 5%; right: -50px; }
-.shape3 { width: 250px; height: 250px; background: rgba(0, 183, 74, 0.15); bottom: 40%; left: 10%; }
+// --- Unified Drag & Drop (Mouse + Touch via Pointer Events) ---
+let dragEl = null;      // element currently being dragged
+let ghostEl = null;     // floating clone shown while dragging
+let startX = 0, startY = 0;
+let pointerDown = false;
+let dragging = false;
+const DRAG_THRESHOLD = 6; // px movement before we treat it as a drag (avoids accidental drags on tap)
 
-.app-container { max-width: 850px; margin: 80px auto 0; padding: 0 20px; }
+document.querySelectorAll('.draggable').forEach(el => {
+    el.addEventListener('pointerdown', onPointerDown);
+});
 
-.glass-panel {
-    background: var(--glass-bg);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid var(--glass-border);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-soft);
-    padding: 35px; margin-bottom: 30px;
+function onPointerDown(e) {
+    if (!quizStarted || isSubmitted) return;
+    // Only left mouse button / primary touch
+    if (e.button !== undefined && e.button !== 0) return;
+
+    dragEl = e.currentTarget;
+    pointerDown = true;
+    dragging = false;
+    startX = e.clientX;
+    startY = e.clientY;
+
+    // Capture pointer so we keep receiving move/up even if finger leaves the element
+    try { dragEl.setPointerCapture(e.pointerId); } catch (err) {}
+
+    window.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('pointerup', onPointerUp);
+    window.addEventListener('pointercancel', onPointerUp);
 }
 
-.hidden { display: none !important; }
-
-#top-bar {
-    position: fixed; top: 0; left: 0; width: 100%;
-    background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px);
-    z-index: 1000; box-shadow: 0 4px 15px rgba(0,0,0,0.03);
-}
-.progress-container { width: 100%; height: 6px; background: #FEF0E6; }
-#progress-bar { height: 100%; width: 0%; background: var(--primary); transition: width 0.4s ease; border-radius: 0 3px 3px 0; }
-.bar-content {
-    display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;
-    max-width: 850px; margin: 0 auto; padding: 12px 20px;
-}
-.teil-badge {
-    background: #FEF0E6; color: var(--primary); padding: 6px 16px;
-    border-radius: 20px; font-weight: 700; font-size: 14px; letter-spacing: 0.5px;
-}
-.timer-badge { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 18px; color: var(--text-main); transition: var(--transition); }
-.timer-badge.warning { color: var(--warning); }
-.timer-badge.danger { color: var(--error); animation: pulse 1s infinite; }
-
-h1 { font-size: 32px; font-weight: 700; text-align: center; color: var(--primary); margin-bottom: 12px; }
-h2 { font-size: 26px; color: var(--text-main); margin-bottom: 25px; }
-h3 { font-size: 22px; color: var(--primary); margin-bottom: 8px; }
-p { color: var(--text-muted); line-height: 1.6; }
-.highlight-text { color: var(--primary); font-weight: 700; }
-
-.section-header { margin-bottom: 25px; }
-.modern-card { background: #ffffff; border-radius: var(--radius-md); padding: 25px; border: 2px solid #FEF0E6; }
-
-.welcome-content { text-align: center; }
-.logo-icon { font-size: 70px; margin-bottom: 15px; }
-.input-group { margin: 30px 0; }
-input[type="text"] {
-    width: 100%; max-width: 350px; padding: 15px 22px;
-    font-size: 18px; border: 2px solid #E2E8F0; border-radius: var(--radius-lg);
-    outline: none; transition: var(--transition); background: #F7FAFC;
-    font-family: inherit; font-weight: 500; text-align: center;
-}
-input[type="text"]:focus { border-color: var(--primary); background: #fff; box-shadow: 0 0 0 5px rgba(255, 140, 66, 0.15); }
-
-.primary-btn, .secondary-btn {
-    border: none; padding: 15px 35px; font-size: 18px; font-weight: 700; font-family: inherit;
-    border-radius: var(--radius-lg); cursor: pointer; transition: var(--transition);
-    display: inline-flex; justify-content: center; align-items: center; gap: 10px;
-}
-.primary-btn { background: var(--primary); color: #fff; box-shadow: 0 6px 20px rgba(255, 140, 66, 0.25); }
-.primary-btn:hover:not(:disabled) { background: var(--primary-hover); transform: translateY(-3px); box-shadow: 0 8px 25px rgba(255, 140, 66, 0.35); }
-.primary-btn:active:not(:disabled) { transform: translateY(0); }
-.primary-btn:disabled { background: #CBD5E0; cursor: not-allowed; box-shadow: none; opacity: 0.9; }
-
-.secondary-btn { background: #EDF2F7; color: var(--text-main); }
-.secondary-btn:hover { background: #E2E8F0; transform: translateY(-2px); }
-
-.action-footer { text-align: center; margin-top: 40px; }
-.submit-btn { min-width: 260px; font-size: 22px; }
-
-.spinner { width: 24px; height: 24px; border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin 1s linear infinite; }
-
-.modal-overlay {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(45, 55, 72, 0.6); backdrop-filter: blur(5px);
-    z-index: 2000; display: flex; align-items: center; justify-content: center;
-}
-.modal-content { background: #fff; border-radius: var(--radius-lg); padding: 40px; max-width: 90%; width: 450px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
-.modal-icon { font-size: 60px; margin-bottom: 15px; animation: bounce 2s infinite; }
-.modal-content h3 { color: var(--warning); font-size: 26px; margin-bottom: 10px; }
-.modal-content p { font-size: 18px; margin-bottom: 30px; }
-.modal-actions { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
-.modal-actions button { font-size: 16px; padding: 12px 25px; }
-
-/* --- Drag & Drop --- */
-.word-bank {
-    background: #FFFDFC; border: 2px dashed #FFD166; border-radius: var(--radius-lg);
-    padding: 25px; min-height: 90px; margin-bottom: 30px;
-    display: flex; flex-wrap: wrap; gap: 14px; transition: var(--transition);
-}
-.word-bank.drag-over { background: #FFF5E6; border-color: var(--primary); }
-
-.draggable {
-    background: #fff; color: var(--text-main); font-weight: 600; font-size: 17px;
-    padding: 10px 22px; border-radius: 25px; cursor: grab; user-select: none;
-    -webkit-user-select: none; -webkit-touch-callout: none;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.06); border: 2px solid #FFF1E6;
-    transition: transform 0.2s, box-shadow 0.2s, color 0.2s;
-    touch-action: none;
-}
-.draggable:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 8px 15px rgba(255, 140, 66, 0.15); color: var(--primary); border-color: #FEF0E6; }
-.draggable:active { cursor: grabbing; transform: scale(0.95); }
-.draggable.dragging { opacity: 0.5; }
-.draggable.touch-active { box-shadow: 0 10px 20px rgba(255, 140, 66, 0.3); border-color: var(--primary); }
-
-.drop-zone {
-    display: inline-flex; align-items: center; justify-content: center;
-    min-width: 100px; min-height: 42px; height: auto; border: 2px dashed #CBD5E0;
-    border-radius: 25px; vertical-align: middle; background: #F7FAFC;
-    margin: 6px; transition: var(--transition); padding: 4px 10px;
-}
-.drop-zone.large { min-width: 170px; }
-.drop-zone.drag-over { background: #FFF5E6; border-color: var(--primary); transform: scale(1.08); }
-.drop-zone .draggable { margin: 0; box-shadow: none; border: none; background: transparent; padding: 0; color: var(--primary); font-size: 17px; touch-action: none; }
-.drop-zone .draggable:hover { transform: none; }
-
-.match-list { list-style: none; }
-.match-list li { margin-bottom: 18px; font-size: 17px; display: flex; align-items: center; flex-wrap: wrap; }
-.match-list li span:first-child { min-width: 150px; font-weight: 500;}
-
-.text-inputs p { margin-bottom: 18px; font-size: 17px; color: var(--text-main); font-weight: 500;}
-.text-gap {
-    width: 55px !important; text-align: center; padding: 6px 10px !important;
-    margin: 0 6px; font-weight: 700; font-size: 17px; color: var(--primary);
-    border-radius: 8px !important; transition: var(--transition);
+function startGhost(x, y) {
+    const rect = dragEl.getBoundingClientRect();
+    ghostEl = dragEl.cloneNode(true);
+    ghostEl.classList.add('touch-clone');
+    ghostEl.style.width = rect.width + 'px';
+    document.body.appendChild(ghostEl);
+    dragEl.classList.add('dragging', 'touch-active');
+    moveGhost(x, y, rect);
 }
 
-.correct { border-color: var(--success) !important; background: #F0FDF4 !important; color: var(--success) !important; box-shadow: 0 0 0 3px rgba(0, 183, 74, 0.15); }
-.incorrect { border-color: var(--error) !important; background: #FEF2F2 !important; color: var(--error) !important; box-shadow: 0 0 0 3px rgba(229, 57, 53, 0.15); animation: shake 0.4s; }
-.drop-zone.correct .draggable { color: var(--success) !important; }
-.drop-zone.incorrect .draggable { color: var(--error) !important; }
-
-.result-header { text-align: center; margin-bottom: 30px; }
-.emoji-huge { font-size: 80px; margin-bottom: 10px; animation: popIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-.stats-grid { display: flex; align-items: center; justify-content: center; gap: 50px; flex-wrap: wrap; margin-bottom: 40px; background: #fff; padding: 30px; border-radius: var(--radius-lg); border: 2px solid #FEF0E6;}
-
-.progress-circle {
-    width: 150px; height: 150px; border-radius: 50%;
-    background: conic-gradient(var(--primary) 0%, #EDF2F7 0%);
-    display: flex; align-items: center; justify-content: center;
-    box-shadow: inset 0 0 20px rgba(0,0,0,0.05); position: relative;
-    transition: background 1.5s ease-out;
-}
-.circle-inner {
-    width: 120px; height: 120px; background: #fff; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 32px; font-weight: 700; color: var(--primary);
-    box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+function moveGhost(x, y, rect) {
+    if (!ghostEl) return;
+    const r = rect || dragEl.getBoundingClientRect();
+    // Offset upward so the finger doesn't cover the dragged word
+    ghostEl.style.left = (x - r.width / 2) + 'px';
+    ghostEl.style.top = (y - r.height / 2 - 46) + 'px';
 }
 
-.stat-details { display: flex; flex-direction: column; gap: 15px; font-size: 19px; }
-.stat-row { display: flex; justify-content: space-between; gap: 30px; border-bottom: 2px dashed #EDF2F7; padding-bottom: 8px; }
-.stat-row .label { font-weight: 600; color: var(--text-muted); }
-.stat-row .val { font-weight: 700; color: var(--text-main); }
-.success-text { color: var(--success) !important; }
-.error-text { color: var(--error) !important; }
+function onPointerMove(e) {
+    if (!pointerDown || !dragEl) return;
 
-#errors-container h3 { text-align: center; margin-bottom: 25px; color: var(--error); border-top: 2px dashed #E2E8F0; padding-top: 35px; font-size: 24px; }
-#errors-list { display: flex; flex-direction: column; gap: 15px; }
-.error-card {
-    background: #fff; border-radius: var(--radius-md); padding: 18px 25px;
-    border-right: 6px solid var(--error);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.04);
-    display: flex; flex-direction: column; gap: 12px;
-}
-.err-header { display: flex; justify-content: flex-start; align-items: center; gap: 8px; flex-direction: row-reverse; }
-.err-q { font-weight: 700; color: var(--text-main); font-size: 18px; text-align: right; width: 100%; direction: rtl;}
-.err-icon { font-size: 18px; color: var(--error); }
-.err-ans-row { display: flex; align-items: center; justify-content: flex-start; gap: 6px; direction: rtl; width: 100%;}
-.err-ans-label { font-weight: 500; font-size: 15px; color: #A0AEC0;}
-.err-ans.user { color: #A0AEC0; text-decoration: line-through; font-size: 15px; }
-.err-ans-row-correct { display: flex; align-items: center; justify-content: flex-start; gap: 6px; direction: rtl; width: 100%;}
-.err-ans-label-correct { color: var(--success); font-size: 15px; font-weight: 600;}
-.err-ans.correct { color: var(--success); font-size: 15px; font-weight: 600; }
-.err-check-icon { background: var(--success); color: white; border-radius: 4px; padding: 2px; font-size: 12px; display: flex; align-items: center; justify-content: center; width: 18px; height: 18px;}
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
 
-@keyframes slideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-@keyframes popIn { 0% { opacity: 0; transform: scale(0.3); } 70% { transform: scale(1.15); } 100% { opacity: 1; transform: scale(1); } }
-@keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.8; } 100% { transform: scale(1); opacity: 1; } }
-@keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
-@keyframes spin { 100% { transform: rotate(360deg); } }
-@keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
+    if (!dragging) {
+        if (Math.abs(dx) > DRAG_THRESHOLD || Math.abs(dy) > DRAG_THRESHOLD) {
+            dragging = true;
+            startGhost(e.clientX, e.clientY);
+        } else {
+            return;
+        }
+    }
 
-.slide-up { animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-.fade-in { animation: fadeIn 0.8s ease forwards; }
-.bounce { animation: bounce 3s ease-in-out infinite; }
+    e.preventDefault();
+    moveGhost(e.clientX, e.clientY);
 
-/* Floating touch clone */
-.touch-clone {
-    position: fixed; pointer-events: none; z-index: 9999; opacity: 0.95;
-    box-shadow: 0 14px 30px rgba(255, 140, 66, 0.45) !important;
-    transform: scale(1.08);
+    // Highlight the drop target under the pointer (ignore the ghost itself)
+    if (ghostEl) ghostEl.style.display = 'none';
+    const below = document.elementFromPoint(e.clientX, e.clientY);
+    if (ghostEl) ghostEl.style.display = '';
+
+    document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+    if (below) {
+        const dropTarget = below.closest('.drop-zone') || below.closest('.word-bank');
+        if (dropTarget) dropTarget.classList.add('drag-over');
+    }
 }
 
-/* --- Mobile Responsiveness --- */
-@media (max-width: 600px) {
-    .app-container { margin-top: 70px; padding: 0 14px; }
-    .glass-panel { padding: 20px 16px; border-radius: 18px; }
-    h1 { font-size: 24px; }
-    h2 { font-size: 21px; }
-    h3 { font-size: 19px; }
-    .bar-content { padding: 10px 14px; }
-    .teil-badge { font-size: 12px; padding: 5px 12px; }
-    .timer-badge { font-size: 16px; }
+function onPointerUp(e) {
+    window.removeEventListener('pointermove', onPointerMove);
+    window.removeEventListener('pointerup', onPointerUp);
+    window.removeEventListener('pointercancel', onPointerUp);
+    pointerDown = false;
 
-    .word-bank { padding: 14px; gap: 10px; }
-    .draggable { padding: 9px 16px; font-size: 15px; }
-    .drop-zone { min-width: 80px; min-height: 40px; margin: 5px; }
-    .drop-zone.large { min-width: 130px; }
-    .drop-zone .draggable { font-size: 15px; }
+    document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
 
-    .match-list li { flex-direction: column; align-items: flex-start; gap: 8px; margin-bottom: 22px; }
-    .match-list li span:first-child { min-width: unset; }
-    .drop-zone { margin: 0; width: 100%; justify-content: flex-start; }
+    if (!dragging) {
+        // It was just a tap/click, not a drag — nothing to do
+        dragEl = null;
+        return;
+    }
 
-    .text-inputs p { font-size: 15px; line-height: 2.1; }
-    .text-gap { width: 48px !important; font-size: 15px; }
+    if (ghostEl) { ghostEl.remove(); ghostEl = null; }
+    dragEl.classList.remove('dragging', 'touch-active');
 
-    .stats-grid { flex-direction: column; gap: 20px; padding: 18px;}
-    .stat-details { width: 100%; font-size: 16px; }
-    .stat-row { gap: 16px; }
-    .progress-circle { width: 130px; height: 130px; }
-    .circle-inner { width: 104px; height: 104px; font-size: 26px; }
+    if (ghostEl) ghostEl.style.display = 'none';
+    const below = document.elementFromPoint(e.clientX, e.clientY);
 
-    .modal-content { padding: 26px 18px; }
-    .modal-icon { font-size: 48px; }
-    .modal-content h3 { font-size: 22px; }
-    .modal-content p { font-size: 16px; }
-    .modal-actions button { width: 100%; }
+    if (below) {
+        const target = below.closest('.drop-zone') || below.closest('.word-bank');
+        if (target) {
+            if (target.classList.contains('drop-zone')) {
+                if (target.children.length === 0) {
+                    target.appendChild(dragEl);
+                } else if (target.children[0] !== dragEl) {
+                    const existingChild = target.children[0];
+                    const originalParent = dragEl.parentNode;
+                    target.appendChild(dragEl);
+                    originalParent.appendChild(existingChild);
+                }
+            } else if (target.classList.contains('word-bank')) {
+                target.appendChild(dragEl);
+            }
+        }
+    }
 
-    .submit-btn { min-width: unset; width: 100%; font-size: 18px; padding: 14px 20px; }
-    .primary-btn, .secondary-btn { padding: 13px 22px; font-size: 16px; }
+    dragEl = null;
+    dragging = false;
 }
 
-@media (max-width: 380px) {
-    .draggable { padding: 8px 13px; font-size: 14px; }
-    .drop-zone { min-width: 70px; }
-    h1 { font-size: 21px; }
+// --- Helpers ---
+function decodeAnswer(encodedAnswer) { return decodeURIComponent(atob(encodedAnswer)); }
+function checkMatch(userInput, encodedAnswer) {
+    if (!userInput) return false;
+    return userInput.trim().toLowerCase() === decodeAnswer(encodedAnswer).toLowerCase();
+}
+function formatTimeSpent(ms) {
+    const totalSeconds = Math.floor(ms / 1000);
+    const m = Math.floor(totalSeconds / 60);
+    const s = totalSeconds % 60;
+    return `${m} دقائق و ${s} ثوانٍ`;
+}
+
+// --- Submit Logic (With Warning Modal) ---
+document.getElementById('check-btn').addEventListener('click', () => {
+    if (isSubmitted) return;
+
+    let hasEmpty = false;
+    document.querySelectorAll('.drop-zone').forEach(el => {
+        if (el.children.length === 0) hasEmpty = true;
+    });
+    document.querySelectorAll('input.text-gap').forEach(el => {
+        if (el.value.trim() === "") hasEmpty = true;
+    });
+
+    if (hasEmpty) {
+        document.getElementById('warning-modal').classList.remove('hidden');
+    } else {
+        handleQuizFinish('بشكل طبيعي');
+    }
+});
+
+document.getElementById('cancel-submit-btn').addEventListener('click', () => {
+    document.getElementById('warning-modal').classList.add('hidden');
+});
+
+document.getElementById('confirm-submit-btn').addEventListener('click', () => {
+    document.getElementById('warning-modal').classList.add('hidden');
+    handleQuizFinish('بشكل طبيعي (مع ترك أسئلة فارغة)');
+});
+
+async function handleQuizFinish(finishReason) {
+    if (isSubmitted) return;
+    isSubmitted = true;
+
+    clearInterval(timerInterval);
+    endTime = new Date();
+
+    const checkBtn = document.getElementById('check-btn');
+    const btnText = checkBtn.querySelector('.btn-text');
+    const spinner = checkBtn.querySelector('.spinner');
+
+    checkBtn.disabled = true;
+    btnText.textContent = "جارٍ تصحيح الامتحان...";
+    spinner.classList.remove('hidden');
+
+    document.querySelectorAll('input[type="text"], .draggable').forEach(el => {
+        if (el.tagName === 'INPUT') el.readOnly = true;
+        else el.setAttribute('draggable', 'false');
+    });
+
+    let score = 0;
+    let total = Object.keys(solutionKey).length;
+    let wrongAnswersReport = [];
+
+    for (const [elementId, encodedAns] of Object.entries(solutionKey)) {
+        const el = document.getElementById(elementId);
+        let isCorrect = false;
+        let userAnswer = "";
+        const correctAnswer = decodeAnswer(encodedAns);
+
+        if (!el) continue;
+
+        if (el.classList.contains('drop-zone')) {
+            if (el.children.length > 0) {
+                userAnswer = el.children[0].textContent.trim();
+                isCorrect = checkMatch(userAnswer, encodedAns);
+            } else {
+                userAnswer = "[فارغ]";
+            }
+        } else if (el.tagName === 'INPUT') {
+            userAnswer = el.value.trim();
+            if (userAnswer === "") userAnswer = "[فارغ]";
+            isCorrect = checkMatch(userAnswer, encodedAns);
+        }
+
+        if (isCorrect) {
+            el.classList.add('correct');
+            score++;
+        } else {
+            el.classList.add('incorrect');
+            const questionLabel = questionLabels[elementId] || elementId;
+            wrongAnswersReport.push({
+                frage: questionLabel,
+                userAntwort: userAnswer,
+                richtigAntwort: correctAnswer
+            });
+        }
+    }
+
+    const timeSpentMs = endTime - startTime;
+    await sendResultsToFormspree(studentName, score, total, wrongAnswersReport, finishReason, timeSpentMs);
+
+    setTimeout(() => {
+        showResultScreen(score, total, timeSpentMs, wrongAnswersReport);
+    }, 2500);
+}
+
+// --- Formspree Integration ---
+async function sendResultsToFormspree(name, score, total, wrongList, reason, timeSpentMs) {
+    const formspreeEndpoint = "https://formspree.io/f/mnjeepje";
+
+    const percentage = Math.round((score / total) * 100);
+    const timeSpentFormatted = formatTimeSpent(timeSpentMs);
+    const finishDateStr = endTime.toLocaleString('ar-EG');
+
+    let wrongAnswersFormatted = "";
+    if (wrongList.length === 0) {
+        wrongAnswersFormatted = "ممتاز! لا توجد أخطاء.";
+    } else {
+        wrongList.forEach((item, index) => {
+            wrongAnswersFormatted += `${index + 1}) السؤال: ${item.frage}\n   - إجابة الطالب: "${item.userAntwort}"\n   - الإجابة الصحيحة: "${item.richtigAntwort}"\n\n`;
+        });
+    }
+
+    const payload = {
+        "اسم الطالب": name,
+        "الدرجة": score,
+        "النسبة المئوية": `${percentage}%`,
+        "وقت إنهاء الامتحان": finishDateStr,
+        "الوقت المستغرق": timeSpentFormatted,
+        "عدد الإجابات الصحيحة": score,
+        "عدد الأخطاء": total - score,
+        "قائمة الأخطاء كاملة": wrongAnswersFormatted,
+        "هل انتهى الامتحان": reason
+    };
+
+    try {
+        await fetch(formspreeEndpoint, {
+            method: "POST",
+            headers: { "Accept": "application/json", "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
+    } catch (error) {
+        console.error("Formspree Error:", error);
+    }
+}
+
+// --- Render Result Screen ---
+function showResultScreen(score, total, timeSpentMs, wrongList) {
+    const percent = Math.round((score / total) * 100);
+
+    document.getElementById('quiz-screen').classList.add('hidden');
+    document.getElementById('top-bar').classList.add('hidden');
+    const resultScreen = document.getElementById('result-screen');
+    resultScreen.classList.remove('hidden');
+
+    const emojiEl = document.getElementById('result-emoji');
+    let color = "var(--primary)";
+    if (percent >= 90) { emojiEl.textContent = "🏆"; color = "var(--success)"; }
+    else if (percent >= 60) { emojiEl.textContent = "👏"; color = "var(--warning)"; }
+    else { emojiEl.textContent = "💪"; color = "var(--error)"; }
+
+    document.getElementById('score-val').textContent = `${score} / ${total}`;
+    document.getElementById('correct-val').textContent = score;
+    document.getElementById('wrong-val').textContent = total - score;
+    document.getElementById('time-val').textContent = formatTimeSpent(timeSpentMs);
+
+    document.getElementById('percent-text').textContent = `${percent}%`;
+    document.getElementById('percent-text').style.color = color;
+    document.getElementById('score-circle').style.background = `conic-gradient(${color} ${percent}%, #EDF2F7 ${percent}%)`;
+
+    if (wrongList.length > 0) {
+        document.getElementById('errors-container').classList.remove('hidden');
+        const errorsListDiv = document.getElementById('errors-list');
+        let html = '';
+        wrongList.forEach(item => {
+            html += `
+                <div class="error-card slide-up">
+                    <div class="err-header">
+                        <div class="err-q">${item.frage}</div>
+                        <div class="err-icon">❌</div>
+                    </div>
+                    <div class="err-ans-row">
+                        <span class="err-ans-label">إجابتك:</span>
+                        <span class="err-ans user">[${item.userAntwort}]</span>
+                    </div>
+                    <div class="err-ans-row-correct">
+                        <span class="err-ans-label-correct">الإجابة الصحيحة:</span>
+                        <span class="err-ans correct">${item.richtigAntwort}</span>
+                        <div class="err-check-icon">✓</div>
+                    </div>
+                </div>
+            `;
+        });
+        errorsListDiv.innerHTML = html;
+    }
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
